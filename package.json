@@ -18,12 +18,14 @@
     "start": "node dist/server/node-build.mjs",
     "test": "vitest --run",
     "format.fix": "prettier --write .",
-    "typecheck": "tsc"
+    "typecheck": "tsc",
+    "setup-python": "cd scraper && pip install -r requirements.txt"
   },
   "dependencies": {
     "dotenv": "^17.2.1",
     "express": "^5.1.0",
-    "zod": "^3.25.76"
+    "zod": "^3.25.76",
+    "openai": "^4.28.4"
   },
   "devDependencies": {
     "@hookform/resolvers": "^5.2.1",
