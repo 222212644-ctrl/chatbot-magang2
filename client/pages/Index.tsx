@@ -1,12 +1,12 @@
-import { useState, useRef, useEffect } from 'react';
-import { Button } from '../components/ui/button';
-import { Input } from '../components/ui/input';
-import { Card } from '../components/ui/card';
-import { Send, Bot, User, ExternalLink } from 'lucide-react';
+import { useState, useRef, useEffect } from "react";
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { Card } from "../components/ui/card";
+import { Send, Bot, User, ExternalLink } from "lucide-react";
 
 interface Message {
   id: string;
-  type: 'user' | 'bot';
+  type: "user" | "bot";
   content: string;
   links?: Array<{
     title: string;
@@ -17,59 +17,60 @@ interface Message {
 }
 
 const mockSearchResults = {
-  'kemiskinan': [
+  kemiskinan: [
     {
-      title: 'Data Kemiskinan Kota Medan 2023',
-      url: 'https://medankota.bps.go.id/statistics-table/subject-563',
-      description: 'Statistik kemiskinan di Kota Medan tahun 2023'
+      title: "Data Kemiskinan Kota Medan 2023",
+      url: "https://medankota.bps.go.id/statistics-table/subject-563",
+      description: "Statistik kemiskinan di Kota Medan tahun 2023",
     },
     {
-      title: 'Profil Kemiskinan Sumatera Utara',
-      url: 'https://medankota.bps.go.id/statistics/poverty-profile',
-      description: 'Profil kemiskinan Provinsi Sumatera Utara'
-    }
+      title: "Profil Kemiskinan Sumatera Utara",
+      url: "https://medankota.bps.go.id/statistics/poverty-profile",
+      description: "Profil kemiskinan Provinsi Sumatera Utara",
+    },
   ],
-  'penduduk': [
+  penduduk: [
     {
-      title: 'Data Kependudukan Kota Medan 2023',
-      url: 'https://medankota.bps.go.id/statistics-table/subject-12',
-      description: 'Statistik kependudukan dan demografi Kota Medan'
+      title: "Data Kependudukan Kota Medan 2023",
+      url: "https://medankota.bps.go.id/statistics-table/subject-12",
+      description: "Statistik kependudukan dan demografi Kota Medan",
     },
     {
-      title: 'Proyeksi Penduduk Kota Medan',
-      url: 'https://medankota.bps.go.id/statistics/population-projection',
-      description: 'Proyeksi jumlah penduduk Kota Medan 2020-2035'
-    }
+      title: "Proyeksi Penduduk Kota Medan",
+      url: "https://medankota.bps.go.id/statistics/population-projection",
+      description: "Proyeksi jumlah penduduk Kota Medan 2020-2035",
+    },
   ],
-  'ekonomi': [
+  ekonomi: [
     {
-      title: 'PDRB Kota Medan 2023',
-      url: 'https://medankota.bps.go.id/statistics-table/subject-52',
-      description: 'Produk Domestik Regional Bruto Kota Medan'
+      title: "PDRB Kota Medan 2023",
+      url: "https://medankota.bps.go.id/statistics-table/subject-52",
+      description: "Produk Domestik Regional Bruto Kota Medan",
     },
     {
-      title: 'Inflasi Kota Medan',
-      url: 'https://medankota.bps.go.id/statistics/inflation',
-      description: 'Data inflasi dan indeks harga konsumen Kota Medan'
-    }
-  ]
+      title: "Inflasi Kota Medan",
+      url: "https://medankota.bps.go.id/statistics/inflation",
+      description: "Data inflasi dan indeks harga konsumen Kota Medan",
+    },
+  ],
 };
 
 export default function Index() {
   const [messages, setMessages] = useState<Message[]>([
     {
-      id: '1',
-      type: 'bot',
-      content: 'Halo! Saya AIDA (AI Data Assistant) dari BPS Kota Medan. Saya dapat membantu Anda mencari informasi dan data statistik yang tersedia di website BPS Kota Medan. Silakan ketik kata kunci yang Anda cari!',
+      id: "1",
+      type: "bot",
+      content:
+        "Halo! Saya AIDA (AI Data Assistant) dari BPS Kota Medan. Saya dapat membantu Anda mencari informasi dan data statistik yang tersedia di website BPS Kota Medan. Silakan ketik kata kunci yang Anda cari!",
       timestamp: new Date(),
-    }
+    },
   ]);
-  const [inputValue, setInputValue] = useState('');
+  const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   useEffect(() => {
@@ -81,13 +82,13 @@ export default function Index() {
 
     const userMessage: Message = {
       id: Date.now().toString(),
-      type: 'user',
+      type: "user",
       content: inputValue,
       timestamp: new Date(),
     };
 
-    setMessages(prev => [...prev, userMessage]);
-    setInputValue('');
+    setMessages((prev) => [...prev, userMessage]);
+    setInputValue("");
     setIsTyping(true);
 
     // Simulate bot response delay
@@ -96,15 +97,16 @@ export default function Index() {
       let botResponse: Message;
 
       // Check if the input matches any of our mock data
-      const matchedKey = Object.keys(mockSearchResults).find(key => 
-        searchKey.includes(key) || key.includes(searchKey)
+      const matchedKey = Object.keys(mockSearchResults).find(
+        (key) => searchKey.includes(key) || key.includes(searchKey),
       );
 
       if (matchedKey) {
-        const results = mockSearchResults[matchedKey as keyof typeof mockSearchResults];
+        const results =
+          mockSearchResults[matchedKey as keyof typeof mockSearchResults];
         botResponse = {
           id: (Date.now() + 1).toString(),
-          type: 'bot',
+          type: "bot",
           content: `Berikut informasi mengenai ${matchedKey} di Kota Medan:`,
           links: results,
           timestamp: new Date(),
@@ -112,26 +114,26 @@ export default function Index() {
       } else {
         botResponse = {
           id: (Date.now() + 1).toString(),
-          type: 'bot',
+          type: "bot",
           content: `Maaf, saya tidak menemukan data spesifik untuk "${inputValue}". Silakan coba kata kunci lain seperti "kemiskinan", "penduduk", atau "ekonomi". Anda juga dapat mengunjungi halaman utama BPS Kota Medan untuk informasi lebih lengkap.`,
           links: [
             {
-              title: 'BPS Kota Medan - Halaman Utama',
-              url: 'https://medankota.bps.go.id/',
-              description: 'Situs resmi Badan Pusat Statistik Kota Medan'
-            }
+              title: "BPS Kota Medan - Halaman Utama",
+              url: "https://medankota.bps.go.id/",
+              description: "Situs resmi Badan Pusat Statistik Kota Medan",
+            },
           ],
           timestamp: new Date(),
         };
       }
 
-      setMessages(prev => [...prev, botResponse]);
+      setMessages((prev) => [...prev, botResponse]);
       setIsTyping(false);
     }, 1500);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
     }
@@ -147,8 +149,12 @@ export default function Index() {
               <Bot className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
             </div>
             <div>
-              <h1 className="text-lg sm:text-xl font-bold text-gray-900">AIDA</h1>
-              <p className="text-xs sm:text-sm text-bps-600">AI Data Assistant - BPS Kota Medan</p>
+              <h1 className="text-lg sm:text-xl font-bold text-gray-900">
+                AIDA
+              </h1>
+              <p className="text-xs sm:text-sm text-bps-600">
+                AI Data Assistant - BPS Kota Medan
+              </p>
             </div>
           </div>
         </div>
@@ -164,8 +170,12 @@ export default function Index() {
                 <Bot className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
               </div>
               <div>
-                <h2 className="text-sm sm:text-base font-semibold text-gray-900">AIDA Assistant</h2>
-                <p className="text-xs sm:text-sm text-bps-600">Siap membantu pencarian data BPS Kota Medan</p>
+                <h2 className="text-sm sm:text-base font-semibold text-gray-900">
+                  AIDA Assistant
+                </h2>
+                <p className="text-xs sm:text-sm text-bps-600">
+                  Siap membantu pencarian data BPS Kota Medan
+                </p>
               </div>
             </div>
           </div>
@@ -175,40 +185,51 @@ export default function Index() {
             {messages.map((message) => (
               <div
                 key={message.id}
-                className={`flex gap-2 sm:gap-3 ${message.type === 'user' ? 'flex-row-reverse' : 'flex-row'}`}
+                className={`flex gap-2 sm:gap-3 ${message.type === "user" ? "flex-row-reverse" : "flex-row"}`}
               >
-                <div className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                  message.type === 'user'
-                    ? 'bg-gray-600'
-                    : 'bg-bps-600'
-                }`}>
-                  {message.type === 'user' ? (
+                <div
+                  className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+                    message.type === "user" ? "bg-gray-600" : "bg-bps-600"
+                  }`}
+                >
+                  {message.type === "user" ? (
                     <User className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
                   ) : (
                     <Bot className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
                   )}
                 </div>
-                <div className={`max-w-[85%] sm:max-w-[80%] ${message.type === 'user' ? 'text-right' : 'text-left'}`}>
-                  <div className={`p-2 sm:p-3 rounded-lg ${
-                    message.type === 'user'
-                      ? 'bg-gray-600 text-white'
-                      : 'bg-bps-50 text-gray-900'
-                  }`}>
+                <div
+                  className={`max-w-[85%] sm:max-w-[80%] ${message.type === "user" ? "text-right" : "text-left"}`}
+                >
+                  <div
+                    className={`p-2 sm:p-3 rounded-lg ${
+                      message.type === "user"
+                        ? "bg-gray-600 text-white"
+                        : "bg-bps-50 text-gray-900"
+                    }`}
+                  >
                     <p className="text-sm">{message.content}</p>
                     {message.links && (
                       <div className="mt-3 space-y-2">
                         {message.links.map((link, index) => (
-                          <div key={index} className="p-2 bg-white rounded border">
-                            <a 
-                              href={link.url} 
-                              target="_blank" 
+                          <div
+                            key={index}
+                            className="p-2 bg-white rounded border"
+                          >
+                            <a
+                              href={link.url}
+                              target="_blank"
                               rel="noopener noreferrer"
                               className="flex items-center gap-2 hover:text-blue-600 transition-colors"
                             >
                               <ExternalLink className="w-4 h-4" />
                               <div>
-                                <p className="font-medium text-sm">{link.title}</p>
-                                <p className="text-xs text-gray-600">{link.description}</p>
+                                <p className="font-medium text-sm">
+                                  {link.title}
+                                </p>
+                                <p className="text-xs text-gray-600">
+                                  {link.description}
+                                </p>
                               </div>
                             </a>
                           </div>
@@ -217,15 +238,15 @@ export default function Index() {
                     )}
                   </div>
                   <p className="text-xs text-gray-500 mt-1">
-                    {message.timestamp.toLocaleTimeString('id-ID', { 
-                      hour: '2-digit', 
-                      minute: '2-digit' 
+                    {message.timestamp.toLocaleTimeString("id-ID", {
+                      hour: "2-digit",
+                      minute: "2-digit",
                     })}
                   </p>
                 </div>
               </div>
             ))}
-            
+
             {isTyping && (
               <div className="flex gap-2 sm:gap-3">
                 <div className="w-6 h-6 sm:w-8 sm:h-8 bg-bps-600 rounded-full flex items-center justify-center">
@@ -234,8 +255,14 @@ export default function Index() {
                 <div className="p-2 sm:p-3 bg-bps-50 rounded-lg">
                   <div className="flex gap-1">
                     <div className="w-2 h-2 bg-bps-400 rounded-full animate-bounce"></div>
-                    <div className="w-2 h-2 bg-bps-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                    <div className="w-2 h-2 bg-bps-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                    <div
+                      className="w-2 h-2 bg-bps-400 rounded-full animate-bounce"
+                      style={{ animationDelay: "0.1s" }}
+                    ></div>
+                    <div
+                      className="w-2 h-2 bg-bps-400 rounded-full animate-bounce"
+                      style={{ animationDelay: "0.2s" }}
+                    ></div>
                   </div>
                 </div>
               </div>
@@ -267,8 +294,14 @@ export default function Index() {
 
         {/* Info Section */}
         <div className="mt-4 sm:mt-6 text-center text-xs sm:text-sm text-gray-600 px-2">
-          <p>AIDA dapat membantu mencari data statistik dari website BPS Kota Medan</p>
-          <p className="mt-1">Gunakan kata kunci seperti "kemiskinan", "penduduk", "ekonomi", atau topik statistik lainnya</p>
+          <p>
+            AIDA dapat membantu mencari data statistik dari website BPS Kota
+            Medan
+          </p>
+          <p className="mt-1">
+            Gunakan kata kunci seperti "kemiskinan", "penduduk", "ekonomi", atau
+            topik statistik lainnya
+          </p>
         </div>
       </div>
     </div>
