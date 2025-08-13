@@ -2,7 +2,14 @@ import { useState, useRef, useEffect } from "react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Card } from "../components/ui/card";
-import { Send, Bot, User, ExternalLink, AlertCircle, Search } from "lucide-react";
+import {
+  Send,
+  Bot,
+  User,
+  ExternalLink,
+  AlertCircle,
+  Search,
+} from "lucide-react";
 
 interface Message {
   id: string;
@@ -70,7 +77,7 @@ export default function Index() {
       }
 
       const data = await response.json();
-      
+
       const botResponse: Message = {
         id: (Date.now() + 1).toString(),
         type: "bot",
@@ -82,14 +89,14 @@ export default function Index() {
 
       setMessages((prev) => [...prev, botResponse]);
       setIsConnected(true);
-
     } catch (error) {
       console.error("Error calling chatbot API:", error);
-      
+
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         type: "bot",
-        content: "Maaf, terjadi kesalahan koneksi. Pastikan server berjalan dan Python dependencies terinstall. Silakan coba lagi nanti.",
+        content:
+          "Maaf, terjadi kesalahan koneksi. Pastikan server berjalan dan Python dependencies terinstall. Silakan coba lagi nanti.",
         timestamp: new Date(),
         error: true,
       };
@@ -112,15 +119,15 @@ export default function Index() {
     if (message.type === "user") {
       return <User className="w-3 h-3 sm:w-4 sm:h-4 text-white" />;
     }
-    
+
     if (message.error) {
       return <AlertCircle className="w-3 h-3 sm:w-4 sm:h-4 text-white" />;
     }
-    
+
     if (message.links && message.links.length > 0) {
       return <Search className="w-3 h-3 sm:w-4 sm:h-4 text-white" />;
     }
-    
+
     return <Bot className="w-3 h-3 sm:w-4 sm:h-4 text-white" />;
   };
 
@@ -128,11 +135,11 @@ export default function Index() {
     if (message.type === "user") {
       return "bg-gray-600 text-white";
     }
-    
+
     if (message.error) {
       return "bg-red-50 text-red-900 border border-red-200";
     }
-    
+
     return "bg-bps-50 text-gray-900";
   };
 
@@ -140,11 +147,11 @@ export default function Index() {
     if (message.type === "user") {
       return "bg-gray-600";
     }
-    
+
     if (message.error) {
       return "bg-red-500";
     }
-    
+
     return "bg-bps-600";
   };
 
@@ -180,12 +187,16 @@ export default function Index() {
                 </p>
               </div>
             </div>
-            
+
             {/* Connection Status */}
             <div className="flex items-center gap-2">
-              <div className={`w-3 h-3 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`}></div>
-              <span className={`text-xs ${isConnected ? 'text-green-600' : 'text-red-600'}`}>
-                {isConnected ? 'Terhubung' : 'Terputus'}
+              <div
+                className={`w-3 h-3 rounded-full ${isConnected ? "bg-green-500" : "bg-red-500"}`}
+              ></div>
+              <span
+                className={`text-xs ${isConnected ? "text-green-600" : "text-red-600"}`}
+              >
+                {isConnected ? "Terhubung" : "Terputus"}
               </span>
             </div>
           </div>
@@ -231,8 +242,12 @@ export default function Index() {
                     message.type === "user" ? "text-right" : "text-left"
                   }`}
                 >
-                  <div className={`p-2 sm:p-3 rounded-lg ${getMessageBubbleColor(message)}`}>
-                    <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                  <div
+                    className={`p-2 sm:p-3 rounded-lg ${getMessageBubbleColor(message)}`}
+                  >
+                    <p className="text-sm whitespace-pre-wrap">
+                      {message.content}
+                    </p>
                     {message.links && message.links.length > 0 && (
                       <div className="mt-3 space-y-2">
                         <p className="text-xs font-medium text-gray-600">
@@ -337,10 +352,12 @@ export default function Index() {
         {/* Info Section */}
         <div className="mt-4 sm:mt-6 text-center text-xs sm:text-sm text-gray-600 px-2">
           <p>
-            AIDA menggunakan AI dan web scraping real-time untuk mencari data dari website BPS Kota Medan
+            AIDA menggunakan AI dan web scraping real-time untuk mencari data
+            dari website BPS Kota Medan
           </p>
           <p className="mt-1">
-            Didukung oleh OpenAI/Ollama dan Python BeautifulSoup untuk hasil pencarian yang akurat
+            Didukung oleh OpenAI/Ollama dan Python BeautifulSoup untuk hasil
+            pencarian yang akurat
           </p>
         </div>
       </div>

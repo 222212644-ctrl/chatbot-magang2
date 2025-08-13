@@ -60,11 +60,13 @@ PING_MESSAGE=BPS Medan AIDA Server is running!
 ### 3. Setup OpenAI atau Ollama
 
 #### Option A: Menggunakan OpenAI
+
 1. Daftar di [OpenAI Platform](https://platform.openai.com/)
 2. Buat API key
 3. Masukkan API key ke `.env`
 
 #### Option B: Menggunakan Ollama (Local AI)
+
 1. Install Ollama dari [ollama.ai](https://ollama.ai/)
 2. Pull model yang diinginkan:
    ```bash
@@ -131,6 +133,7 @@ project/
 ### POST `/api/chatbot`
 
 Request:
+
 ```json
 {
   "message": "kemiskinan di medan"
@@ -138,6 +141,7 @@ Request:
 ```
 
 Response:
+
 ```json
 {
   "response": "AI generated response...",
@@ -168,6 +172,7 @@ Chatbot dapat mengenali berbagai kata kunci:
 ## Troubleshooting
 
 ### Python Error
+
 ```bash
 # Pastikan Python dependencies terinstall
 cd scraper
@@ -178,26 +183,32 @@ python bps_scraper.py "test"
 ```
 
 ### OpenAI API Error
+
 - Pastikan API key valid dan memiliki kredit
 - Cek limit rate API
 
 ### Ollama Error
+
 - Pastikan Ollama service berjalan: `ollama serve`
 - Pastikan model sudah di-pull: `ollama pull llama3`
 
 ### Network Error
+
 - Pastikan koneksi internet stabil
 - Website BPS mungkin sedang maintenance
 
 ## Development
 
 ### Adding New Keywords
+
 Edit file `server/routes/chatbot.ts` pada bagian `keywordMappings`.
 
 ### Improving Scraper
+
 Edit file `scraper/bps_scraper.py` untuk menambah target scraping baru.
 
 ### Custom AI Prompts
+
 Modifikasi method `buildPrompt` di `server/routes/chatbot.ts`.
 
 ## Contributing
