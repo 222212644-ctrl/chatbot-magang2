@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Card } from "../components/ui/card";
-import { Send, Bot, User, ExternalLink } from "lucide-react";
+import { Send, Bot, User, ExternalLink, AlertCircle, Search } from "lucide-react";
 
 interface Message {
   id: string;
@@ -12,48 +12,11 @@ interface Message {
     title: string;
     url: string;
     description: string;
+    type?: string;
   }>;
   timestamp: Date;
+  error?: boolean;
 }
-
-const mockSearchResults = {
-  kemiskinan: [
-    {
-      title: "Data Kemiskinan Kota Medan 2023",
-      url: "https://medankota.bps.go.id/statistics-table/subject-563",
-      description: "Statistik kemiskinan di Kota Medan tahun 2023",
-    },
-    {
-      title: "Profil Kemiskinan Sumatera Utara",
-      url: "https://medankota.bps.go.id/statistics/poverty-profile",
-      description: "Profil kemiskinan Provinsi Sumatera Utara",
-    },
-  ],
-  penduduk: [
-    {
-      title: "Data Kependudukan Kota Medan 2023",
-      url: "https://medankota.bps.go.id/statistics-table/subject-12",
-      description: "Statistik kependudukan dan demografi Kota Medan",
-    },
-    {
-      title: "Proyeksi Penduduk Kota Medan",
-      url: "https://medankota.bps.go.id/statistics/population-projection",
-      description: "Proyeksi jumlah penduduk Kota Medan 2020-2035",
-    },
-  ],
-  ekonomi: [
-    {
-      title: "PDRB Kota Medan 2023",
-      url: "https://medankota.bps.go.id/statistics-table/subject-52",
-      description: "Produk Domestik Regional Bruto Kota Medan",
-    },
-    {
-      title: "Inflasi Kota Medan",
-      url: "https://medankota.bps.go.id/statistics/inflation",
-      description: "Data inflasi dan indeks harga konsumen Kota Medan",
-    },
-  ],
-};
 
 export default function Index() {
   const [messages, setMessages] = useState<Message[]>([
@@ -61,12 +24,13 @@ export default function Index() {
       id: "1",
       type: "bot",
       content:
-        "Halo! Saya AIDA (AI Data Assistant) dari BPS Kota Medan. Saya dapat membantu Anda mencari informasi dan data statistik yang tersedia di website BPS Kota Medan. Silakan ketik kata kunci yang Anda cari!",
+        "Halo! Saya AIDA (AI Data Assistant) dari BPS Kota Medan. Saya dapat membantu Anda mencari informasi dan data statistik yang tersedia di website BPS Kota Medan menggunakan AI dan web scraping real-time. Silakan ketik kata kunci yang Anda cari!",
       timestamp: new Date(),
     },
   ]);
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+  const [isConnected, setIsConnected] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -78,7 +42,7 @@ export default function Index() {
   }, [messages]);
 
   const handleSendMessage = async () => {
-    if (!inputValue.trim()) return;
+    if (!inputValue.trim() || isTyping) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -88,48 +52,53 @@ export default function Index() {
     };
 
     setMessages((prev) => [...prev, userMessage]);
+    const currentInput = inputValue;
     setInputValue("");
     setIsTyping(true);
 
-    // Simulate bot response delay
-    setTimeout(() => {
-      const searchKey = inputValue.toLowerCase();
-      let botResponse: Message;
+    try {
+      const response = await fetch("/api/chatbot", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ message: currentInput }),
+      });
 
-      // Check if the input matches any of our mock data
-      const matchedKey = Object.keys(mockSearchResults).find(
-        (key) => searchKey.includes(key) || key.includes(searchKey),
-      );
-
-      if (matchedKey) {
-        const results =
-          mockSearchResults[matchedKey as keyof typeof mockSearchResults];
-        botResponse = {
-          id: (Date.now() + 1).toString(),
-          type: "bot",
-          content: `Berikut informasi mengenai ${matchedKey} di Kota Medan:`,
-          links: results,
-          timestamp: new Date(),
-        };
-      } else {
-        botResponse = {
-          id: (Date.now() + 1).toString(),
-          type: "bot",
-          content: `Maaf, saya tidak menemukan data spesifik untuk "${inputValue}". Silakan coba kata kunci lain seperti "kemiskinan", "penduduk", atau "ekonomi". Anda juga dapat mengunjungi halaman utama BPS Kota Medan untuk informasi lebih lengkap.`,
-          links: [
-            {
-              title: "BPS Kota Medan - Halaman Utama",
-              url: "https://medankota.bps.go.id/",
-              description: "Situs resmi Badan Pusat Statistik Kota Medan",
-            },
-          ],
-          timestamp: new Date(),
-        };
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
 
+      const data = await response.json();
+      
+      const botResponse: Message = {
+        id: (Date.now() + 1).toString(),
+        type: "bot",
+        content: data.response || "Maaf, tidak ada respons dari server.",
+        links: data.links || [],
+        timestamp: new Date(),
+        error: !!data.error,
+      };
+
       setMessages((prev) => [...prev, botResponse]);
+      setIsConnected(true);
+
+    } catch (error) {
+      console.error("Error calling chatbot API:", error);
+      
+      const errorMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        type: "bot",
+        content: "Maaf, terjadi kesalahan koneksi. Pastikan server berjalan dan Python dependencies terinstall. Silakan coba lagi nanti.",
+        timestamp: new Date(),
+        error: true,
+      };
+
+      setMessages((prev) => [...prev, errorMessage]);
+      setIsConnected(false);
+    } finally {
       setIsTyping(false);
-    }, 1500);
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -139,22 +108,85 @@ export default function Index() {
     }
   };
 
+  const getMessageIcon = (message: Message) => {
+    if (message.type === "user") {
+      return <User className="w-3 h-3 sm:w-4 sm:h-4 text-white" />;
+    }
+    
+    if (message.error) {
+      return <AlertCircle className="w-3 h-3 sm:w-4 sm:h-4 text-white" />;
+    }
+    
+    if (message.links && message.links.length > 0) {
+      return <Search className="w-3 h-3 sm:w-4 sm:h-4 text-white" />;
+    }
+    
+    return <Bot className="w-3 h-3 sm:w-4 sm:h-4 text-white" />;
+  };
+
+  const getMessageBubbleColor = (message: Message) => {
+    if (message.type === "user") {
+      return "bg-gray-600 text-white";
+    }
+    
+    if (message.error) {
+      return "bg-red-50 text-red-900 border border-red-200";
+    }
+    
+    return "bg-bps-50 text-gray-900";
+  };
+
+  const getAvatarColor = (message: Message) => {
+    if (message.type === "user") {
+      return "bg-gray-600";
+    }
+    
+    if (message.error) {
+      return "bg-red-500";
+    }
+    
+    return "bg-bps-600";
+  };
+
+  const getLinkTypeIcon = (type?: string) => {
+    switch (type) {
+      case "statistics":
+        return "📊";
+      case "publication":
+        return "📄";
+      case "navigation":
+        return "🔗";
+      default:
+        return "📍";
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-bps-50 to-bps-100">
       {/* Header */}
       <div className="bg-white shadow-sm border-b">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-bps-600 rounded-lg flex items-center justify-center">
-              <Bot className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-bps-600 rounded-lg flex items-center justify-center">
+                <Bot className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+              </div>
+              <div>
+                <h1 className="text-lg sm:text-xl font-bold text-gray-900">
+                  AIDA
+                </h1>
+                <p className="text-xs sm:text-sm text-bps-600">
+                  AI Data Assistant - BPS Kota Medan
+                </p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-lg sm:text-xl font-bold text-gray-900">
-                AIDA
-              </h1>
-              <p className="text-xs sm:text-sm text-bps-600">
-                AI Data Assistant - BPS Kota Medan
-              </p>
+            
+            {/* Connection Status */}
+            <div className="flex items-center gap-2">
+              <div className={`w-3 h-3 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`}></div>
+              <span className={`text-xs ${isConnected ? 'text-green-600' : 'text-red-600'}`}>
+                {isConnected ? 'Terhubung' : 'Terputus'}
+              </span>
             </div>
           </div>
         </div>
@@ -174,7 +206,7 @@ export default function Index() {
                   AIDA Assistant
                 </h2>
                 <p className="text-xs sm:text-sm text-bps-600">
-                  Siap membantu pencarian data BPS Kota Medan
+                  Pencarian real-time dengan AI & Web Scraping
                 </p>
               </div>
             </div>
@@ -185,51 +217,56 @@ export default function Index() {
             {messages.map((message) => (
               <div
                 key={message.id}
-                className={`flex gap-2 sm:gap-3 ${message.type === "user" ? "flex-row-reverse" : "flex-row"}`}
+                className={`flex gap-2 sm:gap-3 ${
+                  message.type === "user" ? "flex-row-reverse" : "flex-row"
+                }`}
               >
                 <div
-                  className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                    message.type === "user" ? "bg-gray-600" : "bg-bps-600"
-                  }`}
+                  className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center flex-shrink-0 ${getAvatarColor(message)}`}
                 >
-                  {message.type === "user" ? (
-                    <User className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
-                  ) : (
-                    <Bot className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
-                  )}
+                  {getMessageIcon(message)}
                 </div>
                 <div
-                  className={`max-w-[85%] sm:max-w-[80%] ${message.type === "user" ? "text-right" : "text-left"}`}
+                  className={`max-w-[85%] sm:max-w-[80%] ${
+                    message.type === "user" ? "text-right" : "text-left"
+                  }`}
                 >
-                  <div
-                    className={`p-2 sm:p-3 rounded-lg ${
-                      message.type === "user"
-                        ? "bg-gray-600 text-white"
-                        : "bg-bps-50 text-gray-900"
-                    }`}
-                  >
-                    <p className="text-sm">{message.content}</p>
-                    {message.links && (
+                  <div className={`p-2 sm:p-3 rounded-lg ${getMessageBubbleColor(message)}`}>
+                    <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                    {message.links && message.links.length > 0 && (
                       <div className="mt-3 space-y-2">
+                        <p className="text-xs font-medium text-gray-600">
+                          Hasil pencarian ({message.links.length} link):
+                        </p>
                         {message.links.map((link, index) => (
                           <div
                             key={index}
-                            className="p-2 bg-white rounded border"
+                            className="p-2 bg-white rounded border hover:shadow-sm transition-shadow"
                           >
                             <a
                               href={link.url}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="flex items-center gap-2 hover:text-blue-600 transition-colors"
+                              className="flex items-start gap-2 hover:text-bps-600 transition-colors"
                             >
-                              <ExternalLink className="w-4 h-4" />
-                              <div>
-                                <p className="font-medium text-sm">
-                                  {link.title}
-                                </p>
-                                <p className="text-xs text-gray-600">
+                              <span className="text-sm mt-0.5">
+                                {getLinkTypeIcon(link.type)}
+                              </span>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-1">
+                                  <p className="font-medium text-sm truncate">
+                                    {link.title}
+                                  </p>
+                                  <ExternalLink className="w-3 h-3 flex-shrink-0" />
+                                </div>
+                                <p className="text-xs text-gray-600 mt-0.5">
                                   {link.description}
                                 </p>
+                                {link.type && (
+                                  <span className="inline-block px-1.5 py-0.5 bg-bps-100 text-bps-700 text-xs rounded mt-1">
+                                    {link.type}
+                                  </span>
+                                )}
                               </div>
                             </a>
                           </div>
@@ -250,19 +287,24 @@ export default function Index() {
             {isTyping && (
               <div className="flex gap-2 sm:gap-3">
                 <div className="w-6 h-6 sm:w-8 sm:h-8 bg-bps-600 rounded-full flex items-center justify-center">
-                  <Bot className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
+                  <Search className="w-3 h-3 sm:w-4 sm:h-4 text-white animate-pulse" />
                 </div>
                 <div className="p-2 sm:p-3 bg-bps-50 rounded-lg">
-                  <div className="flex gap-1">
-                    <div className="w-2 h-2 bg-bps-400 rounded-full animate-bounce"></div>
-                    <div
-                      className="w-2 h-2 bg-bps-400 rounded-full animate-bounce"
-                      style={{ animationDelay: "0.1s" }}
-                    ></div>
-                    <div
-                      className="w-2 h-2 bg-bps-400 rounded-full animate-bounce"
-                      style={{ animationDelay: "0.2s" }}
-                    ></div>
+                  <div className="flex items-center gap-2">
+                    <div className="flex gap-1">
+                      <div className="w-2 h-2 bg-bps-400 rounded-full animate-bounce"></div>
+                      <div
+                        className="w-2 h-2 bg-bps-400 rounded-full animate-bounce"
+                        style={{ animationDelay: "0.1s" }}
+                      ></div>
+                      <div
+                        className="w-2 h-2 bg-bps-400 rounded-full animate-bounce"
+                        style={{ animationDelay: "0.2s" }}
+                      ></div>
+                    </div>
+                    <span className="text-xs text-gray-600">
+                      Mencari dan menganalisis data...
+                    </span>
                   </div>
                 </div>
               </div>
@@ -277,7 +319,7 @@ export default function Index() {
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyPress={handleKeyPress}
-                placeholder="Ketik kata kunci pencarian data..."
+                placeholder="Ketik kata kunci pencarian data (contoh: kemiskinan, penduduk, ekonomi)..."
                 className="flex-1 text-sm"
                 disabled={isTyping}
               />
@@ -295,12 +337,10 @@ export default function Index() {
         {/* Info Section */}
         <div className="mt-4 sm:mt-6 text-center text-xs sm:text-sm text-gray-600 px-2">
           <p>
-            AIDA dapat membantu mencari data statistik dari website BPS Kota
-            Medan
+            AIDA menggunakan AI dan web scraping real-time untuk mencari data dari website BPS Kota Medan
           </p>
           <p className="mt-1">
-            Gunakan kata kunci seperti "kemiskinan", "penduduk", "ekonomi", atau
-            topik statistik lainnya
+            Didukung oleh OpenAI/Ollama dan Python BeautifulSoup untuk hasil pencarian yang akurat
           </p>
         </div>
       </div>
