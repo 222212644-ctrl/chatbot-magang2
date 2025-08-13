@@ -266,7 +266,7 @@ export default function Index() {
         </Card>
 
         {/* Info Section */}
-        <div className="mt-6 text-center text-sm text-gray-600">
+        <div className="mt-4 sm:mt-6 text-center text-xs sm:text-sm text-gray-600 px-2">
           <p>AIDA dapat membantu mencari data statistik dari website BPS Kota Medan</p>
           <p className="mt-1">Gunakan kata kunci seperti "kemiskinan", "penduduk", "ekonomi", atau topik statistik lainnya</p>
         </div>
