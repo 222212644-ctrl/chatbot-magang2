@@ -244,20 +244,20 @@ export default function Index() {
           </div>
 
           {/* Input */}
-          <div className="p-4 border-t">
+          <div className="p-3 sm:p-4 border-t">
             <div className="flex gap-2">
               <Input
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyPress={handleKeyPress}
-                placeholder="Ketik kata kunci pencarian data (contoh: kemiskinan, penduduk, ekonomi)..."
-                className="flex-1"
+                placeholder="Ketik kata kunci pencarian data..."
+                className="flex-1 text-sm"
                 disabled={isTyping}
               />
               <Button
                 onClick={handleSendMessage}
                 disabled={!inputValue.trim() || isTyping}
-                className="bg-blue-600 hover:bg-blue-700"
+                className="bg-bps-600 hover:bg-bps-700 px-3"
               >
                 <Send className="w-4 h-4" />
               </Button>
