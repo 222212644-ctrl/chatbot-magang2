@@ -175,24 +175,24 @@ export default function Index() {
             {messages.map((message) => (
               <div
                 key={message.id}
-                className={`flex gap-3 ${message.type === 'user' ? 'flex-row-reverse' : 'flex-row'}`}
+                className={`flex gap-2 sm:gap-3 ${message.type === 'user' ? 'flex-row-reverse' : 'flex-row'}`}
               >
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                  message.type === 'user' 
-                    ? 'bg-gray-600' 
-                    : 'bg-blue-600'
+                <div className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+                  message.type === 'user'
+                    ? 'bg-gray-600'
+                    : 'bg-bps-600'
                 }`}>
                   {message.type === 'user' ? (
-                    <User className="w-4 h-4 text-white" />
+                    <User className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
                   ) : (
-                    <Bot className="w-4 h-4 text-white" />
+                    <Bot className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
                   )}
                 </div>
-                <div className={`max-w-[80%] ${message.type === 'user' ? 'text-right' : 'text-left'}`}>
-                  <div className={`p-3 rounded-lg ${
+                <div className={`max-w-[85%] sm:max-w-[80%] ${message.type === 'user' ? 'text-right' : 'text-left'}`}>
+                  <div className={`p-2 sm:p-3 rounded-lg ${
                     message.type === 'user'
                       ? 'bg-gray-600 text-white'
-                      : 'bg-blue-50 text-gray-900'
+                      : 'bg-bps-50 text-gray-900'
                   }`}>
                     <p className="text-sm">{message.content}</p>
                     {message.links && (
