@@ -19,7 +19,9 @@
     "test": "vitest --run",
     "format.fix": "prettier --write .",
     "typecheck": "tsc",
-    "setup-python": "cd scraper && pip install -r requirements.txt"
+    "setup-python": "cd scraper && pip install -r requirements.txt",
+    "setup-ollama": "bash scripts/setup-ollama.sh",
+    "test-scraper": "cd scraper && python bps_scraper.py kemiskinan"
   },
   "dependencies": {
     "dotenv": "^17.2.1",
