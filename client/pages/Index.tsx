@@ -138,25 +138,25 @@ export default function Index() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100">
+    <div className="min-h-screen bg-gradient-to-br from-bps-50 to-bps-100">
       {/* Header */}
       <div className="bg-white shadow-sm border-b">
-        <div className="max-w-4xl mx-auto px-4 py-4">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center">
-              <Bot className="w-6 h-6 text-white" />
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-bps-600 rounded-lg flex items-center justify-center">
+              <Bot className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-gray-900">AIDA</h1>
-              <p className="text-sm text-blue-600">AI Data Assistant - BPS Kota Medan</p>
+              <h1 className="text-lg sm:text-xl font-bold text-gray-900">AIDA</h1>
+              <p className="text-xs sm:text-sm text-bps-600">AI Data Assistant - BPS Kota Medan</p>
             </div>
           </div>
         </div>
       </div>
 
       {/* Chat Container */}
-      <div className="max-w-4xl mx-auto px-4 py-6">
-        <Card className="h-[600px] flex flex-col bg-white shadow-lg">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
+        <Card className="h-[calc(100vh-120px)] sm:h-[600px] flex flex-col bg-white shadow-lg">
           {/* Chat Header */}
           <div className="p-4 border-b bg-blue-50">
             <div className="flex items-center gap-3">
